@@ -7,6 +7,7 @@ import {
   getAllReports,
 } from "../controllers/reportController";
 import { authenticate } from "../middlewares/auth";
+import asyncHandler from "../middlewares/asyncHandler";
 
 const router = Router();
 
@@ -16,8 +17,12 @@ router.get(
   authenticate,
   getWeeklyReport
 );
-router.get("/reports", authenticate, getAllReports);
-router.post("/reports", authenticate, createOrUpdateWeeklyReport);
-router.get("/summary/:locationId/:weekStartDate", authenticate, getSummary);
+router.get("/reports", authenticate, asyncHandler(getAllReports));
+router.post("/reports", authenticate, asyncHandler(createOrUpdateWeeklyReport));
+router.get(
+  "/summary/:locationId/:weekStartDate",
+  authenticate,
+  asyncHandler(getSummary)
+);
 
 export default router;
