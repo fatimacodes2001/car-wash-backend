@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  role      Role
+  manager   Manager?  @relation("UserToManager")
+
+  @@map("users")
+}
+
+model Manager {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @unique
+  locationId Int       @unique
+  user       User      @relation("UserToManager", fields: [userId], references: [id], onDelete: Cascade)
+  location   Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@map("managers")
+}
+
+model Location {
+  id       Int             @id @default(autoincrement())
+  name     String
+  state    State
+  manager  Manager?
+  reports  WeeklyReport[]
+
+  @@map("locations")
+}
+
+model WeeklyReport {
+  id                    Int      @id @default(autoincrement())
+  locationId            Int
+  weekStartDate         DateTime
+  weekEndDate           DateTime
+  carCountMonFri        Int
+  carCountSatSun        Int
+  retailCarCountMonFri  Int
+  retailCarCountSatSun  Int
+  retailRevenueMonFri   Float
+  retailRevenueSatSun   Float
+  totalRevenueMonFri    Float
+  totalRevenueSatSun    Float
+  staffHoursMonFri      Float
+  staffHoursSatSun      Float
+  totalClubPlanMembers  Int       
+  totalClubPlansSold    Int      @default(0) 
+  location              Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@map("weekly_reports")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+}
+
+enum State {
+  ILL
+  GA
+}
+
