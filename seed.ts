@@ -92,7 +92,7 @@ const main = async () => {
       },
     });
   };
-
+  let i = 1;
   for (const loc of locations) {
     const location = await prisma.location.create({
       data: loc,
@@ -100,7 +100,7 @@ const main = async () => {
 
     await prisma.user.create({
       data: {
-        email: `manager${location.id}@example.com`,
+        email: `manager${i}@example.com`,
         password: hashedPassword,
         role: "MANAGER",
         manager: {
@@ -110,6 +110,7 @@ const main = async () => {
         },
       },
     });
+    i += 1;
 
     await createReports(location.id, twoWeeksAgoMonday, twoWeeksAgoSunday);
     await createReports(location.id, lastMonday, lastSunday);
