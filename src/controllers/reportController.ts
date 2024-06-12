@@ -72,3 +72,36 @@ export const getAllReports = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch all reports" });
   }
 };
+
+export const getReportAvailability = async (req: Request, res: Response) => {
+  const { weekStartDate } = req.params;
+  const startDate = new Date(weekStartDate);
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 6);
+
+  try {
+    const locationsWithReports = await prisma.location.findMany({
+      include: {
+        reports: {
+          where: {
+            weekStartDate: startDate,
+            weekEndDate: endDate,
+          },
+          select: {
+            id: true, // Select only the id to check availability
+          },
+        },
+      },
+    });
+
+    const availability = locationsWithReports.map((location) => ({
+      name: location.name,
+      isDataAvailable: location.reports.length > 0,
+    }));
+
+    res.json(availability);
+  } catch (error) {
+    console.error("Error fetching report availability:", error);
+    res.status(500).json({ error: "Failed to fetch report availability" });
+  }
+};

@@ -4,6 +4,7 @@ import {
   getWeeklyReport,
   createOrUpdateWeeklyReport,
   getSummary,
+  getReportAvailability,
   getAllReports,
 } from "../controllers/reportController";
 import { authenticate } from "../middlewares/auth";
@@ -23,6 +24,11 @@ router.get(
   "/summary/:locationId/:weekStartDate",
   authenticate,
   asyncHandler(getSummary)
+);
+router.get(
+  "/report-availability/:weekStartDate",
+  authenticate,
+  asyncHandler(getReportAvailability)
 );
 
 export default router;
